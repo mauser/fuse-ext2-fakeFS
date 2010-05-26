@@ -29,17 +29,9 @@ int op_read (const char *path, char *buf, size_t size, off_t offset, struct fuse
 
 	debugf("enter");
 	debugf("path = %s", path);
-
-	rc = ext2fs_file_llseek(efile, offset, SEEK_SET, &pos);
-	if (rc) {
-		return -EINVAL;
-	}
-
-	rc = ext2fs_file_read(efile, buf, size, &bytes);
-	if (rc) {
-		return -EIO;
-	}
+	
+	memset(buf, 80, size);
 
 	debugf("leave");
-	return bytes;
+	return size;
 }

@@ -45,16 +45,19 @@ size_t do_write (ext2_file_t efile, const char *buf, size_t size, off_t offset)
 		}
 	}
 
+	/*
 	rt = ext2fs_file_llseek(efile, offset, SEEK_SET, &npos);
 	if (rt) {
 		debugf("ext2fs_file_lseek(efile, %lld, SEEK_SET, &npos); failed", offset);
 		return rt;
-	}
+	}*/
 
-	for (rt = 0, wr = 0, tmp = buf; size > 0 && rt == 0; size -= wr, tmp += wr) {
-		debugf("size: %u, written: %u", size, wr);
-		rt = ext2fs_file_write(efile, tmp, size, &wr);
-	}
+	//for (rt = 0, wr = 0, tmp = buf; size > 0 && rt == 0; size -= wr, tmp += wr) {
+		//debugf("size: %u, written: %u", size, wr);
+	char c[] = "10";
+ 	rt = ext2fs_file_write(efile, c, 2, &wr);
+	//}
+	
 	if (rt) {
 		debugf("ext2fs_file_write(edile, tmp, size, &wr); failed");
 		return rt;
@@ -67,7 +70,7 @@ size_t do_write (ext2_file_t efile, const char *buf, size_t size, off_t offset)
 	}
 
 	debugf("leave");
-	return wr;
+	return size;
 }
 
 int op_write (const char *path, const char *buf, size_t size, off_t offset, struct fuse_file_info *fi)
