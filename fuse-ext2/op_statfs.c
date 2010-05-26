@@ -19,6 +19,13 @@
  */
 
 #include "fuse-ext2.h"
+#include <sys/types.h>
+#include <dirent.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/stat.h>
+struct dirent *readdir(DIR *dir);
+
 
 static int test_root (int a, int b)
 {
@@ -93,6 +100,7 @@ int op_statfs (const char *path, struct statvfs *buf)
 	buf->f_frsize = EXT2_FRAG_SIZE(e2fs->super);
 	buf->f_blocks = EXT2_BLOCKS_COUNT(e2fs->super) - s_overhead_last;
 	buf->f_bfree = EXT2_FBLOCKS_COUNT(e2fs->super);
+	
 	if (EXT2_FBLOCKS_COUNT(e2fs->super) < EXT2_RBLOCKS_COUNT(e2fs->super)) {
 		buf->f_bavail = 0;
 	} else {
@@ -102,6 +110,41 @@ int op_statfs (const char *path, struct statvfs *buf)
 	buf->f_ffree = e2fs->super->s_free_inodes_count;
 	buf->f_favail = e2fs->super->s_free_inodes_count;
 	buf->f_namemax = EXT2_NAME_LEN;
+	
+	struct dirent *dp;
+	
+	printf("BLOCK SIZE %d",  EXT2_BLOCK_SIZE(e2fs->super) ); 
+	
+	long bytes = 0;
+	
+	DIR* dirp = opendir(".");
+	while (dirp)
+	{
+			 dp = readdir(dirp);
+
+			 if (dp != NULL ) {
+				if( dp->d_type == 8 ){
+					struct stat s;
+					stat( dp->d_name , &s);
+					bytes += s.st_size;
+				}	
+			} else {
+				 closedir(dirp);
+				 break;
+			}
+	}
+	
+
+	
+	long blocks = bytes / EXT2_BLOCK_SIZE(e2fs->super); 
+	buf->f_blocks = buf->f_blocks * 100;
+	buf->f_bfree = buf->f_blocks - blocks;
+	buf->f_bavail =  buf->f_bfree;
+	
+	printf("Bytes: %ld\n", bytes);
+	printf("KBytes: %ld\n", bytes / 1024);
+	printf("MBytes: %ld\n", bytes / 1024 / 1024);
+	printf("Blocks: %ld\n", blocks);
 
 	debugf("leave");
 	return 0;
