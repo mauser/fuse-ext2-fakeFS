@@ -9,7 +9,10 @@ AC_PROG_CXX
 AC_PROG_AWK
 AC_PROG_CC
 AC_PROG_INSTALL
+m4_pattern_allow([AM_PROG_AR])
+AM_PROG_AR
 AC_PROG_LIBTOOL
+AM_PROG_CC_C_O
 AC_PATH_PROG(CHMOD, chmod, :)
 
 case $target_os in
